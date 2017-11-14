@@ -13,6 +13,8 @@
 		C207C74C1FBA93CC007A2551 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C207C74B1FBA93CC007A2551 /* Assets.xcassets */; };
 		C207C74F1FBA93CC007A2551 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C207C74D1FBA93CC007A2551 /* LaunchScreen.storyboard */; };
 		C207C7521FBA93CC007A2551 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C207C7511FBA93CC007A2551 /* main.m */; };
+		C207C75B1FBAA177007A2551 /* KNBillboadrView.m in Sources */ = {isa = PBXBuildFile; fileRef = C207C75A1FBAA177007A2551 /* KNBillboadrView.m */; };
+		C207C75E1FBAD090007A2551 /* NSTimer+KNTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = C207C75D1FBAD090007A2551 /* NSTimer+KNTimer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,10 @@
 		C207C74E1FBA93CC007A2551 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C207C7501FBA93CC007A2551 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C207C7511FBA93CC007A2551 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		C207C7591FBAA177007A2551 /* KNBillboadrView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KNBillboadrView.h; sourceTree = "<group>"; };
+		C207C75A1FBAA177007A2551 /* KNBillboadrView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KNBillboadrView.m; sourceTree = "<group>"; };
+		C207C75C1FBAD090007A2551 /* NSTimer+KNTimer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSTimer+KNTimer.h"; sourceTree = "<group>"; };
+		C207C75D1FBAD090007A2551 /* NSTimer+KNTimer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSTimer+KNTimer.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +64,7 @@
 		C207C7411FBA93CC007A2551 /* KNBillboardScrollView */ = {
 			isa = PBXGroup;
 			children = (
+				C207C7581FBAA147007A2551 /* KNBillboadrView */,
 				C207C7421FBA93CC007A2551 /* AppDelegate.h */,
 				C207C7431FBA93CC007A2551 /* AppDelegate.m */,
 				C207C7451FBA93CC007A2551 /* ViewController.h */,
@@ -69,6 +76,17 @@
 				C207C7511FBA93CC007A2551 /* main.m */,
 			);
 			path = KNBillboardScrollView;
+			sourceTree = "<group>";
+		};
+		C207C7581FBAA147007A2551 /* KNBillboadrView */ = {
+			isa = PBXGroup;
+			children = (
+				C207C7591FBAA177007A2551 /* KNBillboadrView.h */,
+				C207C75A1FBAA177007A2551 /* KNBillboadrView.m */,
+				C207C75C1FBAD090007A2551 /* NSTimer+KNTimer.h */,
+				C207C75D1FBAD090007A2551 /* NSTimer+KNTimer.m */,
+			);
+			path = KNBillboadrView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,8 +161,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				C207C7471FBA93CC007A2551 /* ViewController.m in Sources */,
+				C207C75E1FBAD090007A2551 /* NSTimer+KNTimer.m in Sources */,
 				C207C7521FBA93CC007A2551 /* main.m in Sources */,
 				C207C7441FBA93CC007A2551 /* AppDelegate.m in Sources */,
+				C207C75B1FBAA177007A2551 /* KNBillboadrView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
