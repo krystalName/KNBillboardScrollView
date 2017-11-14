@@ -25,7 +25,23 @@
 //轮播图片的数组
 @property(nonatomic, strong)NSMutableArray *imageArray;
 
+@property(nonatomic, strong)UIScrollView *scrollView;
 
+@property(nonatomic, strong)UIPageControl *pageControl;
+
+@property(nonatomic, strong)UIImageView *currImageView;
+
+@property(nonatomic, strong)UIImageView *otherImageView;
+
+@property(nonatomic, assign)NSInteger currIndex;
+
+@property(nonatomic, assign)NSInteger nextIndex;
+
+@property(nonatomic, assign)CGSize pageImageSize;
+
+@property(nonatomic, strong)NSTimer *timer;
+
+@property(nonatomic, strong)NSOperationQueue *queue;
 @end
 
 @implementation KNBillboadrView
