@@ -56,20 +56,11 @@ UIImage *gitImageNamed(NSString *imageName);
 /**
  创建轮播View
 
- @param rect rect.位置设置大小
+ @param frame rect.位置设置大小
  @param imageArray 图片数组
- @param descArray 描叙数组
+ @param descArray 描叙数组,可为空,为空情况不显示描叙文字
  */
--(void)createKNBillboadrViewForRect:(CGRect *)rect andImageArray:(NSArray *)imageArray andDescArray:(NSArray *)descArray;
-
-
-/**
- 创建轮播图View
-
- @param rect rect位置大小
- @param imageArray 图片数组
- */
--(void)setKNBillboadrViewForRect:(CGRect *)rect andImageArray:(NSArray *)imageArray;
+-(instancetype)initKNBillboadrViewWithFrame:(CGRect )frame andImageArray:(NSArray *)imageArray andDescArray:(NSArray *)descArray;
 
 
 /**
@@ -121,14 +112,14 @@ UIImage *gitImageNamed(NSString *imageName);
 ///设置占位图 默认设置为 KNBilboardDefalutImge.png
 @property(nonatomic, strong)UIImage *placeholdImage;
 
-///设置图片描叙的颜色
+///设置图片描叙的颜色 默认白色字体
 @property(nonatomic, strong)UIColor *DescLableColor;
 
-///设置图片描叙的字体大小
+///设置图片描叙的字体大小 默认字体大小13
 @property(nonatomic, strong)UIFont *DescLableFont;
 
-///设置描叙的字体背景颜色
-@property(nonatomic, strong)UIColor *DescLableColorBakegrundColor;
+///设置描叙的字体背景颜色 默认为 [UIColor colorWithWhite:0 alpha:0.5];
+@property(nonatomic, strong)UIColor *DescLableBackgroundColor;
 
 ///设置自动缓存. 默认为打开
 @property(nonatomic, assign)BOOL autoCache;
