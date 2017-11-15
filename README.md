@@ -2,7 +2,9 @@
 # KNBillboardScrollView 
 
 ### 这是一个广告栏。实现无限循环播放图片，获取网络图片，实现本地存储。 没有借用任何第三方控件 
-上一张效果图
+
+----
+## 上一张效果图
 
 ![](https://github.com/krystalName/KNBillboardScrollView/blob/master/billboardView.gif)
 
