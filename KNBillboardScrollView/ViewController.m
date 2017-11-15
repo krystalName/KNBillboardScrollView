@@ -23,24 +23,26 @@
     
     
     //定义两个数组。
-    
     NSArray *imageArray = @[
                              [UIImage imageNamed:@"3.jpg"],
-                            @"https://www.baiduyunfuli.com/wp-content/uploads/2016/11/zhangxueyouyanchanghui.jpg",
-                             gifImageNamed(@"2.gif"),
-                              @"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1510742500435&di=423f1fec806fe7d093de2390b71fe173&imgtype=0&src=http%3A%2F%2Fpic.962.net%2Fup%2F2016-12%2F14821185309667631.gif"
+                            @"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1510747788301&di=1265b6a44927172a90f3bebcf088ab02&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2F5243fbf2b2119313373b1edd6f380cd791238d67.jpg",
+                              gifImageNamed(@"2.gif"),
+                              @"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1510747412310&di=308b1b2e2d6ccb6a35796275fc185eaf&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01f90e593a4ad4a8012193a3dcf03d.gif"
                             ];
     
     NSArray *descArray = @[@"本地看星星",@"网络图片",@"本地gif图片",@"网络gif图片"];
     
     
+    //创建广告栏
     _bollboadrView = [[KNBillboadrView alloc]initKNBillboadrViewWithFrame:CGRectMake(0, 50, [UIScreen mainScreen].bounds.size.width, 200) andImageArray:imageArray andDescArray:descArray andplaceholdImage:[UIImage imageNamed:@"KNBilboardDefalutImge.png"]];
     
+    [_bollboadrView setPageColor:[UIColor redColor] andCurrentPageColor:[UIColor whiteColor]];
     //设置代理
     _bollboadrView.delegate = self;
     //设置分页控件的位置，默认为PositionBottomCenter
     _bollboadrView.KNPageCotrollPostion = KNPostionBottomLeft;
-    
+    //设置切换时间
+    _bollboadrView.time = 5.f;
     //设置动画
     _bollboadrView.KNChangeMode = KNChangeModeFade;
     
@@ -52,6 +54,8 @@
     
     
 }
+
+
 
 -(void)KNBillboadrView:(KNBillboadrView *)BillboadrView ClickImageForIndex:(NSInteger)index
 {

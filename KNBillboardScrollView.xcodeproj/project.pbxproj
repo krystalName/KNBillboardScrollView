@@ -15,9 +15,9 @@
 		C207C7521FBA93CC007A2551 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C207C7511FBA93CC007A2551 /* main.m */; };
 		C207C75B1FBAA177007A2551 /* KNBillboadrView.m in Sources */ = {isa = PBXBuildFile; fileRef = C207C75A1FBAA177007A2551 /* KNBillboadrView.m */; };
 		C207C75E1FBAD090007A2551 /* NSTimer+KNTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = C207C75D1FBAD090007A2551 /* NSTimer+KNTimer.m */; };
-		C207C7611FBC2B81007A2551 /* 2.gif in Resources */ = {isa = PBXBuildFile; fileRef = C207C7601FBC2B81007A2551 /* 2.gif */; };
 		C207C7631FBC2B98007A2551 /* 3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = C207C7621FBC2B98007A2551 /* 3.jpg */; };
 		C207C7651FBC2C8D007A2551 /* KNBilboardDefalutImge.png in Resources */ = {isa = PBXBuildFile; fileRef = C207C7641FBC2C8D007A2551 /* KNBilboardDefalutImge.png */; };
+		C207C7691FBC3E18007A2551 /* 2.gif in Resources */ = {isa = PBXBuildFile; fileRef = C207C7681FBC3E18007A2551 /* 2.gif */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,9 +35,9 @@
 		C207C75A1FBAA177007A2551 /* KNBillboadrView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KNBillboadrView.m; sourceTree = "<group>"; };
 		C207C75C1FBAD090007A2551 /* NSTimer+KNTimer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSTimer+KNTimer.h"; sourceTree = "<group>"; };
 		C207C75D1FBAD090007A2551 /* NSTimer+KNTimer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSTimer+KNTimer.m"; sourceTree = "<group>"; };
-		C207C7601FBC2B81007A2551 /* 2.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = 2.gif; sourceTree = "<group>"; };
 		C207C7621FBC2B98007A2551 /* 3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 3.jpg; sourceTree = "<group>"; };
 		C207C7641FBC2C8D007A2551 /* KNBilboardDefalutImge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = KNBilboardDefalutImge.png; sourceTree = "<group>"; };
+		C207C7681FBC3E18007A2551 /* 2.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2.gif; path = ../../../../../Downloads/2.gif; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,8 +99,8 @@
 		C207C75F1FBC2B66007A2551 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				C207C7681FBC3E18007A2551 /* 2.gif */,
 				C207C7621FBC2B98007A2551 /* 3.jpg */,
-				C207C7601FBC2B81007A2551 /* 2.gif */,
 				C207C7641FBC2C8D007A2551 /* KNBilboardDefalutImge.png */,
 			);
 			path = images;
@@ -164,12 +164,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C207C7691FBC3E18007A2551 /* 2.gif in Resources */,
 				C207C7631FBC2B98007A2551 /* 3.jpg in Resources */,
 				C207C7651FBC2C8D007A2551 /* KNBilboardDefalutImge.png in Resources */,
 				C207C74F1FBA93CC007A2551 /* LaunchScreen.storyboard in Resources */,
 				C207C74C1FBA93CC007A2551 /* Assets.xcassets in Resources */,
 				C207C74A1FBA93CC007A2551 /* Main.storyboard in Resources */,
-				C207C7611FBC2B81007A2551 /* 2.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
