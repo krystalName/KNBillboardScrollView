@@ -53,7 +53,8 @@ typedef NS_ENUM(NSInteger, KNChangeMode){
  @param imageName 本地gif图片请使用该函数创建，否则gif无动画效果
  @return 图片名称
  */
-UIImage *gitImageNamed(NSString *imageName);
+
+UIImage *gifImageNamed(NSString *imageName);
 
 
 @interface KNBillboadrView : UIView
@@ -67,7 +68,7 @@ UIImage *gitImageNamed(NSString *imageName);
  @param frame rect.位置设置大小
  @param imageArray 图片数组
  @param descArray 描叙数组,可为空,为空情况不显示描叙文字
- @param andplaceholdImage 默认图。网络图片没加载出来的时候使用
+ @param placeholdImage 默认图。网络图片没加载出来的时候使用
  */
 -(instancetype)initKNBillboadrViewWithFrame:(CGRect )frame andImageArray:(NSArray *)imageArray andDescArray:(NSArray *)descArray andplaceholdImage:(UIImage *)placeholdImage;
 

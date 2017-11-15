@@ -18,6 +18,8 @@
 
 
 
+
+
 @interface KNBillboadrView()<UIScrollViewDelegate>
 
 ///图片描叙控件,默认在底部
@@ -61,7 +63,7 @@
 ///队列
 @property(nonatomic, strong)NSOperationQueue *queue;
 
-
+//默认占位图
 @property(nonatomic, strong)UIImage *placeholdImage;
 
 @end
@@ -124,11 +126,11 @@ static NSString *cache;
     [super layoutSubviews];
     //有导航控制器时，会默认在scrollview上方添加64的内边距，这里强制设置为0
     self.scrollView.contentInset = UIEdgeInsetsZero;
-    
     self.scrollView.frame = self.bounds;
-    
     self.descLable.frame = CGRectMake(0 , self.height - DEFAULTHEIGT , self.width, DEFAULTHEIGT);
     self.KNPageCotrollPostion = _KNPageCotrollPostion;
+    //设置scrollview 的位置
+    [self setScrollViewContentSize];
 }
 
 
@@ -148,6 +150,7 @@ static NSString *cache;
     }
     if (_currIndex >= self.images.count)_currIndex = self.images.count -1;
     self.currImageView.image = self.images[_currIndex];
+    self.descLable.text = self.titles[_currIndex];
     self.pageControl.numberOfPages = self.images.count;
     [self layoutSubviews];
 }
@@ -172,6 +175,7 @@ static NSString *cache;
     }
     //重新计算pageControl的位置
     self.KNPageCotrollPostion = _KNPageCotrollPostion;
+
     
 }
 
@@ -343,8 +347,7 @@ static NSString *cache;
     if (_KNChangeMode == KNChangeModeFade) {
         
         self.nextIndex = (self.currIndex + 1) % self.images.count;
-        self.otherImageView.image = _images[_currIndex];
-        
+        self.otherImageView.image = self.images[self.nextIndex];
         [UIView animateWithDuration:1.2 animations:^{
             self.currImageView.alpha = 0;
             self.otherImageView.alpha = 1;
@@ -657,7 +660,6 @@ float durationWithSourceAtIndex(CGImageSourceRef source, NSUInteger index) {
 @end
 
 
-
 UIImage *gifImageNamed(NSString *imageName) {
     
     if (![imageName hasSuffix:@".gif"]) {
@@ -670,4 +672,11 @@ UIImage *gifImageNamed(NSString *imageName) {
     
     return [UIImage imageNamed:imageName];
 }
+
+
+
+
+
+
+
 
