@@ -108,7 +108,7 @@ static NSString *cache;
     [self setDescribe];
 }
 
-#pragma mark- frame相关
+#pragma mark - frame相关
 - (CGFloat)height{
     return self.scrollView.frame.size.height;
 }
@@ -174,6 +174,44 @@ static NSString *cache;
     self.KNPageCotrollPostion = _KNPageCotrollPostion;
     
 }
+
+
+#pragma mark - ---------设置pageControl的位置---------
+-(void)setKNPageCotrollPostion:(KNPageControllPostion)KNPageCotrollPostion
+{
+    _KNPageCotrollPostion = KNPageCotrollPostion;
+    //设置隐藏模式。 如果设置了隐藏就隐藏。 图片数量等于1的时候也设置成隐藏
+    _pageControl.hidden = (_KNPageCotrollPostion == KNPostionHide) || (self.images.count == 1);
+    if (_pageControl.hidden) return;
+    
+    CGSize size;
+    if (!_pageImageSize.width) { // 没有设置图片。 系统有原有样式
+        size = [_pageControl sizeForNumberOfPages:_pageControl.numberOfPages];
+        size.height = 8;
+    }else{
+        //设置了图片
+        size = CGSizeMake(_pageImageSize.width *(_pageControl.numberOfPages * 2 - 1), _pageImageSize.height);
+    }
+    _pageControl.frame = CGRectMake(0, 0, size.width, size.height);
+    
+    CGFloat centerY = self.height - size.height *0.5 - VERMARGIN
+    - (self.descLable.hidden ? 0 : DEFAULTHEIGT);
+    CGFloat pointY = self.height - size.height - VERMARGIN - (self.descLable.hidden ?0 : DEFAULTHEIGT);
+    
+    if (_KNPageCotrollPostion == KNPostionDefalut || _KNPageCotrollPostion == KNPostionBottomCenter) {
+        _pageControl.center = CGPointMake(self.width, centerY);
+    }else if (_KNPageCotrollPostion == KNPostionBottomLeft){
+        _pageControl.frame = CGRectMake(DEFAULTPOTINT, pointY, size.width, size.height);
+    }else{
+        _pageControl.frame = CGRectMake(self.height - DEFAULTPOTINT - size.width , pointY, size.width, size.height);
+    }
+    
+    if (!CGPointEqualToPoint(_pageOffset , CGPointZero)) {
+        self.pageOffset = _pageOffset;
+    }
+    
+}
+
 
 
 #pragma mark - -------设置scrollView的contentSize---------
@@ -298,42 +336,6 @@ static NSString *cache;
 }
 
 
-
-#pragma mark - ---------设置pageControl的位置---------
--(void)setKNPageCotrollPostion:(KNPageControllPostion)KNPageCotrollPostion
-{
-    _KNPageCotrollPostion = KNPageCotrollPostion;
-    //设置隐藏模式。 如果设置了隐藏就隐藏。 图片数量等于1的时候也设置成隐藏
-    _pageControl.hidden = (_KNPageCotrollPostion == KNPostionHide) || (self.images.count == 1);
-    if (_pageControl.hidden) return;
-    
-    CGSize size;
-    if (!_pageImageSize.width) { // 没有设置图片。 系统有原有样式
-        size = [_pageControl sizeForNumberOfPages:_pageControl.numberOfPages];
-        size.height = 8;
-    }else{
-        //设置了图片
-        size = CGSizeMake(_pageImageSize.width *(_pageControl.numberOfPages * 2 - 1), _pageImageSize.height);
-    }
-    _pageControl.frame = CGRectMake(0, 0, size.width, size.height);
-    
-    CGFloat centerY = self.height - size.height *0.5 - VERMARGIN
-    - (self.descLable.hidden ? 0 : DEFAULTHEIGT);
-    CGFloat pointY = self.height - size.height - VERMARGIN - (self.descLable.hidden ?0 : DEFAULTHEIGT);
-    
-    if (_KNPageCotrollPostion == KNPostionDefalut || _KNPageCotrollPostion == KNPostionBottomCenter) {
-        _pageControl.center = CGPointMake(self.width, centerY);
-    }else if (_KNPageCotrollPostion == KNPostionBottomLeft){
-        _pageControl.frame = CGRectMake(DEFAULTPOTINT, pointY, size.width, size.height);
-    }else{
-        _pageControl.frame = CGRectMake(self.height - DEFAULTPOTINT - size.width , pointY, size.width, size.height);
-    }
-    
-    if (!CGPointEqualToPoint(_pageOffset , CGPointZero)) {
-        self.pageOffset = _pageOffset;
-    }
-    
-}
 
 
 //下一页
