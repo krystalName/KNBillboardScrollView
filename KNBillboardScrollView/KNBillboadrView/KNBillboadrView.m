@@ -85,10 +85,12 @@ static NSString *cache;
 {
     self = [super initWithFrame:frame];
     if (self) {
+        //先获取到值。
         self.placeholdImage = placeholdImage;
-        [self initView];
         self.imageArray = imageArray;
         self.titles = [NSMutableArray arrayWithArray:descArray];
+        //然后初始化控件
+        [self initView];
     }
     return self;
 }
@@ -102,6 +104,8 @@ static NSString *cache;
     
     //设置图片
     [self setImageForArray];
+    //设置标题
+    [self setDescribe];
 }
 
 #pragma mark- frame相关
@@ -125,8 +129,8 @@ static NSString *cache;
     
     self.descLable.frame = CGRectMake(0 , self.height - DEFAULTHEIGT , self.width, DEFAULTHEIGT);
     self.KNPageCotrollPostion = _KNPageCotrollPostion;
-    
 }
+
 
 #pragma mark - 设置图片数组
 -(void)setImageForArray{
@@ -172,6 +176,32 @@ static NSString *cache;
 }
 
 
+#pragma mark - -------设置scrollView的contentSize---------
+- (void)setScrollViewContentSize {
+    if (self.images.count > 1) {
+        self.scrollView.contentSize = CGSizeMake(self.width * 5, 0);
+        self.scrollView.contentOffset = CGPointMake(self.width * 2, 0);
+        self.currImageView.frame = CGRectMake(self.width * 2, 0, self.width, self.height);
+        
+        if (_KNChangeMode == KNChangeModeFade) {
+            //淡入淡出模式，两个imageView都在同一位置，改变透明度就可以了
+            _currImageView.frame = CGRectMake(0, 0, self.width, self.height);
+            _otherImageView.frame = self.currImageView.frame;
+            _otherImageView.alpha = 0;
+            [self insertSubview:self.currImageView atIndex:0];
+            [self insertSubview:self.otherImageView atIndex:1];
+        }
+        [self startTimer];
+    } else {
+        //只要一张图片时，scrollview不可滚动，且关闭定时器
+        self.scrollView.contentSize = CGSizeZero;
+        self.scrollView.contentOffset = CGPointZero;
+        self.currImageView.frame = CGRectMake(0, 0, self.width, self.height);
+        [self stopTimer];
+    }
+}
+
+
 #pragma mark 当图片滚动过半时就修改当前页码
 - (void)changeCurrentPageWithOffset:(CGFloat)offsetX {
     if (offsetX < self.width * 1.5) {
@@ -186,11 +216,30 @@ static NSString *cache;
 }
 
 
-#pragma mark - UIScrollViewDelegate
+#pragma mark - 切换图片
+-(void)changToNext{
+    if (_KNChangeMode == KNChangeModeFade) {
+        self.currImageView.alpha = 1;
+        self.otherImageView.alpha = 0;
+    }
+    //切换下张图片
+    self.currImageView.image = self.otherImageView.image;
+    self.scrollView.contentOffset = CGPointMake(self.width * 2, 0);
+    [self.scrollView layoutSubviews];
+    self.currIndex = self.nextIndex;
+    self.pageControl.currentPage = self.nextIndex;
+    self.descLable.text = self.titles[self.currIndex];
+}
+
+
+
+
+
+#pragma mark - ---------UIScrollViewDelegate------------
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     if (CGSizeEqualToSize(CGSizeZero, scrollView.contentSize))return;
- 
+    
     CGFloat offsetX = scrollView.contentOffset.x;
     
     //判断gif的动画方式
@@ -210,21 +259,19 @@ static NSString *cache;
             self.otherImageView.frame = CGRectMake(self.width, 8, self.width, self.height);
         }
         self.nextIndex = self.currIndex -1;
-        if (self.nextIndex < 0) {
-            self.nextIndex = self.images.count -1;
-        }
+        if (self.nextIndex < 0) self.nextIndex = self.images.count -1;
         self.otherImageView.image = self.images[self.nextIndex];
         if (offsetX <= self.width ) {
             [self changToNext];
         }
         
     }else if(offsetX > self.width * 2){
-         if (_KNChangeMode == KNChangeModeFade) {
-             self.otherImageView.alpha = offsetX / self.width -2;
-             self.currImageView.alpha = 3 - offsetX / self.width;
-         }else{
-             self.otherImageView.frame = CGRectMake(CGRectGetMaxX(_currImageView.frame), 0, self.width, self.height);
-         }
+        if (_KNChangeMode == KNChangeModeFade) {
+            self.otherImageView.alpha = offsetX / self.width -2;
+            self.currImageView.alpha = 3 - offsetX / self.width;
+        }else{
+            self.otherImageView.frame = CGRectMake(CGRectGetMaxX(_currImageView.frame), 0, self.width, self.height);
+        }
         self.nextIndex = (self.currIndex + 1) % self.images.count;
         self.otherImageView.image = self.images[self.nextIndex];
         if (offsetX >= self.width * 3) [self changToNext];
@@ -233,10 +280,26 @@ static NSString *cache;
 
 
 
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    [self stopTimer];
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate{
+    [self startTimer];
+}
+
+//该方法用来修复滚动过快导致分页异常的bug
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    if (_KNChangeMode == KNChangeModeFade) return;
+    CGPoint currPointInSelf = [_scrollView convertPoint:_currImageView.frame.origin toView:self];
+    if (currPointInSelf.x >= -self.width / 2 && currPointInSelf.x <= self.width / 2)
+        [self.scrollView setContentOffset:CGPointMake(self.width * 2, 0) animated:YES];
+    else [self changToNext];
+}
 
 
 
-#pragma mark 设置pageControl的位置
+#pragma mark - ---------设置pageControl的位置---------
 -(void)setKNPageCotrollPostion:(KNPageControllPostion)KNPageCotrollPostion
 {
     _KNPageCotrollPostion = KNPageCotrollPostion;
@@ -273,24 +336,7 @@ static NSString *cache;
 }
 
 
-- (void)setPageOffset:(CGPoint)pageOffset {
-    _pageOffset = pageOffset;
-    CGRect frame = _pageControl.frame;
-    frame.origin.x += pageOffset.x;
-    frame.origin.y += pageOffset.y;
-    _pageControl.frame = frame;
-}
-
-
--(void)setKNChangeMode:(KNChangeMode)KNChangeMode
-{
-    _KNChangeMode = KNChangeMode;
-    if (KNChangeMode == KNChangeModeFade) {
-        _gifPlayMode = KNGifPlayModeAlways;
-    }
-    
-}
-
+//下一页
 -(void)nextPage{
     if (_KNChangeMode == KNChangeModeFade) {
         
@@ -311,6 +357,7 @@ static NSString *cache;
 }
 
 
+
 #pragma mark- --------定时器相关方法--------
 - (void)startTimer {
     //如果只有一张图片，则直接返回，不开启定时器
@@ -325,69 +372,7 @@ static NSString *cache;
 }
 
 
-
-
-
-//切换图片
--(void)changToNext{
-    if (_KNChangeMode == KNChangeModeFade) {
-        self.currImageView.alpha = 1;
-        self.otherImageView.alpha = 0;
-    }
-    //切换下张图片
-    self.currImageView.image = self.otherImageView.image;
-    self.scrollView.contentOffset = CGPointMake(self.width * 2, 0);
-    [self.scrollView layoutSubviews];
-    self.currIndex = self.nextIndex;
-    self.pageControl.currentPage = self.nextIndex;
-    self.descLable.text = self.titles[self.currIndex];
-}
-
-
--(void)setGifPlayMode:(KNGifPlayMode)gifPlayMode
-{
-    if (_KNChangeMode == KNChangeModeFade)return;
-    _gifPlayMode = gifPlayMode;
-    
-    if (gifPlayMode == KNGifPlayModeAlways) {
-        [self gifAnimating:YES];
-    }else if(gifPlayMode == KNGifPlayModeNever)
-    {
-        [self gifAnimating:NO];
-    }
-}
-
-#pragma mark - 设置相关
--(void)setDescLableFont:(UIFont *)DescLableFont
-{
-    _DescLableFont = DescLableFont;
-    self.descLable.font = DescLableFont;
-    
-}
-
--(void)setDescLableColor:(UIColor *)DescLableColor{
-    _DescLableColor = DescLableColor;
-    self.descLable.textColor = DescLableColor;
-}
-
--(void)setDescLableBackgroundColor:(UIColor *)DescLableBackgroundColor{
-    _DescLableBackgroundColor = DescLableBackgroundColor;
-    self.descLable.backgroundColor = DescLableBackgroundColor;
-}
-
-#pragma mark 设置pageControl的指示器图片
--(void)setPageColor:(UIColor *)color andCurrentPageColor:(UIColor *)currentColor{
-    self.pageControl.pageIndicatorTintColor = color;
-    self.pageControl.currentPageIndicatorTintColor = currentColor;
-}
-
--(void)setPageImage:(UIImage *)image andCurrentPageImage:(UIImage *)currentImage{
-    if (!image || !currentImage)return;
-    
-    self.pageImageSize = image.size;
-    [self.pageControl setValue:currentImage forKey:@"_currentPageImage"];
-    [self.pageControl setValue:image forKey:@"_pageImage"];
-}
+#pragma mark - ---------其他方法--------------
 
 #pragma mark - 下载网络图片
 -(void)downloadImages:(int)index{
@@ -472,7 +457,24 @@ float durationWithSourceAtIndex(CGImageSourceRef source, NSUInteger index) {
     }
 }
 
+#pragma mark 设置定时器时间
+- (void)setTime:(NSTimeInterval)time {
+    _time = time;
+    [self startTimer];
+}
 
+- (void)stopTimer {
+    [self.timer invalidate];
+    self.timer = nil;
+}
+
+#pragma mark 图片点击事件
+- (void)imageClick {
+    
+    ([_delegate respondsToSelector:@selector(KNBillboadrView:ClickImageForIndex:)]);
+    [_delegate KNBillboadrView:self ClickImageForIndex:self.currIndex];
+    
+}
 
 - (void)gifAnimating:(BOOL)b {
     [self gifAnimating:b view:self.currImageView];
@@ -496,29 +498,78 @@ float durationWithSourceAtIndex(CGImageSourceRef source, NSUInteger index) {
 }
 
 
-#pragma mark 设置定时器时间
-- (void)setTime:(NSTimeInterval)time {
-    _time = time;
-    [self startTimer];
-}
 
 
 
 
-- (void)stopTimer {
-    [self.timer invalidate];
-    self.timer = nil;
-}
-
-
-
-#pragma mark 图片点击事件
-- (void)imageClick {
+#pragma mark - 设置相关
+-(void)setGifPlayMode:(KNGifPlayMode)gifPlayMode
+{
+    if (_KNChangeMode == KNChangeModeFade)return;
+    _gifPlayMode = gifPlayMode;
     
-    ([_delegate respondsToSelector:@selector(KNBillboadrView:ClickImageForIndex:)]);
-    [_delegate KNBillboadrView:self ClickImageForIndex:self.currIndex];
+    if (gifPlayMode == KNGifPlayModeAlways) {
+        [self gifAnimating:YES];
+    }else if(gifPlayMode == KNGifPlayModeNever)
+    {
+        [self gifAnimating:NO];
+    }
+}
+
+
+-(void)setDescLableFont:(UIFont *)DescLableFont
+{
+    _DescLableFont = DescLableFont;
+    self.descLable.font = DescLableFont;
     
 }
+
+-(void)setDescLableColor:(UIColor *)DescLableColor{
+    _DescLableColor = DescLableColor;
+    self.descLable.textColor = DescLableColor;
+}
+
+-(void)setDescLableBackgroundColor:(UIColor *)DescLableBackgroundColor{
+    _DescLableBackgroundColor = DescLableBackgroundColor;
+    self.descLable.backgroundColor = DescLableBackgroundColor;
+}
+
+#pragma mark 设置pageControl的指示器图片
+-(void)setPageColor:(UIColor *)color andCurrentPageColor:(UIColor *)currentColor{
+    self.pageControl.pageIndicatorTintColor = color;
+    self.pageControl.currentPageIndicatorTintColor = currentColor;
+}
+
+-(void)setPageImage:(UIImage *)image andCurrentPageImage:(UIImage *)currentImage{
+    if (!image || !currentImage)return;
+    
+    self.pageImageSize = image.size;
+    [self.pageControl setValue:currentImage forKey:@"_currentPageImage"];
+    [self.pageControl setValue:image forKey:@"_pageImage"];
+}
+
+
+-(void)setKNChangeMode:(KNChangeMode)KNChangeMode
+{
+    _KNChangeMode = KNChangeMode;
+    if (KNChangeMode == KNChangeModeFade) {
+        _gifPlayMode = KNGifPlayModeAlways;
+    }
+    
+}
+
+
+- (void)setPageOffset:(CGPoint)pageOffset {
+    _pageOffset = pageOffset;
+    CGRect frame = _pageControl.frame;
+    frame.origin.x += pageOffset.x;
+    frame.origin.y += pageOffset.y;
+    _pageControl.frame = frame;
+}
+
+
+
+
 
 #pragma mark - 懒加载.
 -(NSOperationQueue *)queue{
@@ -601,6 +652,20 @@ float durationWithSourceAtIndex(CGImageSourceRef source, NSUInteger index) {
     return _images;
 }
 
-
-
 @end
+
+
+
+UIImage *gifImageNamed(NSString *imageName) {
+    
+    if (![imageName hasSuffix:@".gif"]) {
+        imageName = [imageName stringByAppendingString:@".gif"];
+    }
+    
+    NSString *imagePath = [[NSBundle mainBundle] pathForResource:imageName ofType:nil];
+    NSData *data = [NSData dataWithContentsOfFile:imagePath];
+    if (data) return getImageWithData(data);
+    
+    return [UIImage imageNamed:imageName];
+}
+
