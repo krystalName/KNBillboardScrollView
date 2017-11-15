@@ -15,8 +15,7 @@
 #define DEFAULTPOTINT 10
 #define VERMARGIN 5
 #define DEFAULTHEIGT 20
-#define HEIGHT self.scrollView.frame.size.height
-#define WIDTH self.scrollView.frame.size.width
+
 
 
 @interface KNBillboadrView()<UIScrollViewDelegate>
@@ -24,10 +23,16 @@
 ///图片描叙控件,默认在底部
 @property(nonatomic, strong)UILabel *descLable;
 
-///轮播图片的数组
-@property(nonatomic, strong)NSMutableArray *imageArray;
 
-@property(nonatomic, strong)NSMutableArray *titleArray;
+//保存的图片数组
+@property(nonatomic, strong)NSArray *imageArray;
+
+///轮播图片的数组
+@property(nonatomic, strong)NSMutableArray *images;
+
+
+//描叙数组
+@property(nonatomic, strong)NSMutableArray *titles;
 
 ///滑动控件
 @property(nonatomic, strong)UIScrollView *scrollView;
@@ -56,6 +61,9 @@
 ///队列
 @property(nonatomic, strong)NSOperationQueue *queue;
 
+
+@property(nonatomic, strong)UIImage *placeholdImage;
+
 @end
 
 static NSString *cache;
@@ -67,27 +75,256 @@ static NSString *cache;
 {
     cache = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"KNCarousel"];
     BOOL isDir = NO;
-    BOOL isExists = [[NSFileManager defaultManager] fileExistsAtPath:cache isDirectory:isDir];
+    BOOL isExists = [[NSFileManager defaultManager] fileExistsAtPath:cache isDirectory:&isDir];
     if (!isExists || !isDir) {
         [[NSFileManager defaultManager] createDirectoryAtPath:cache withIntermediateDirectories:YES attributes:nil error:nil];
     }
 }
 
-- (instancetype)initKNBillboadrViewWithFrame:(CGRect )frame andImageArray:(NSArray *)imageArray andDescArray:(NSArray *)descArray
+- (instancetype)initKNBillboadrViewWithFrame:(CGRect )frame andImageArray:(NSArray *)imageArray andDescArray:(NSArray *)descArray andplaceholdImage:(UIImage *)placeholdImage
 {
     self = [super initWithFrame:frame];
     if (self) {
-        [self.imageArray addObjectsFromArray:imageArray];
-        [self.titleArray addObjectsFromArray:descArray];
-        
-
+        self.placeholdImage = placeholdImage;
+        [self initView];
+        self.imageArray = imageArray;
+        self.titles = [NSMutableArray arrayWithArray:descArray];
     }
     return self;
 }
 
-//图片点击
--(void)imageClick{
+-(void)initView{
     
+    self.autoCache = YES;
+    [self addSubview:self.scrollView];
+    [self addSubview:self.descLable];
+    [self addSubview:self.pageControl];
+    
+    //设置图片
+    [self setImageForArray];
+}
+
+#pragma mark- frame相关
+- (CGFloat)height{
+    return self.scrollView.frame.size.height;
+}
+
+- (CGFloat)width{
+    return self.scrollView.frame.size.width;
+}
+
+
+#pragma mark - 布局子控件
+-(void)layoutSubviews
+{
+    [super layoutSubviews];
+    //有导航控制器时，会默认在scrollview上方添加64的内边距，这里强制设置为0
+    self.scrollView.contentInset = UIEdgeInsetsZero;
+    
+    self.scrollView.frame = self.bounds;
+    
+    self.descLable.frame = CGRectMake(0 , self.height - DEFAULTHEIGT , self.width, DEFAULTHEIGT);
+    self.KNPageCotrollPostion = _KNPageCotrollPostion;
+    
+}
+
+#pragma mark - 设置图片数组
+-(void)setImageForArray{
+    //设置图片
+    if(!self.imageArray.count) return;
+    for (int i = 0; i<self.imageArray.count; i++) {
+        if ([self.imageArray[i] isKindOfClass:[UIImage class]]) {
+            [self.images addObject:self.imageArray[i]];
+        }else if ([self.imageArray[i] isKindOfClass:[NSString class]]){
+            //如果是网络图片。 则先添加占位图..下载完后替换掉
+            [self.images addObject:self.placeholdImage];
+            //下载图片
+            [self downloadImages:i];
+        }
+    }
+    if (_currIndex >= self.images.count)_currIndex = self.images.count -1;
+    self.currImageView.image = self.images[_currIndex];
+    self.pageControl.numberOfPages = self.images.count;
+    [self layoutSubviews];
+}
+
+#pragma mark - 设置描叙
+-(void)setDescribe{
+    if (!self.titles.count){
+        self.titles = nil;
+        self.descLable.hidden = YES;
+    }else
+    {
+        //先判断.如果图片个数大于标签个数，就设置添加空值进去
+        if (self.titles.count < self.imageArray.count) {
+            NSMutableArray *describes = [NSMutableArray arrayWithArray:self.titles];
+            for (NSInteger i = self.titles.count; i < self.imageArray.count; i++) {
+                [describes addObject:@""];
+            }
+            self.titles = describes;
+        }
+        self.descLable.hidden = NO;
+        self.descLable.text = self.titles[_currIndex];
+    }
+    //重新计算pageControl的位置
+    self.KNPageCotrollPostion = _KNPageCotrollPostion;
+    
+}
+
+
+#pragma mark 当图片滚动过半时就修改当前页码
+- (void)changeCurrentPageWithOffset:(CGFloat)offsetX {
+    if (offsetX < self.width * 1.5) {
+        NSInteger index = self.currIndex - 1;
+        if (index < 0) index = self.images.count - 1;
+        _pageControl.currentPage = index;
+    } else if (offsetX > self.width * 2.5){
+        _pageControl.currentPage = (self.currIndex + 1) % self.images.count;
+    } else {
+        _pageControl.currentPage = self.currIndex;
+    }
+}
+
+
+#pragma mark - UIScrollViewDelegate
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    if (CGSizeEqualToSize(CGSizeZero, scrollView.contentSize))return;
+ 
+    CGFloat offsetX = scrollView.contentOffset.x;
+    
+    //判断gif的动画方式
+    if (_gifPlayMode == KNGifPlayModePauseWhenScroll) {
+        [self gifAnimating:(offsetX == self.width *2)];
+    }
+    
+    //滚动过程中。改变当前页码
+}
+
+
+
+
+
+
+#pragma mark 设置pageControl的位置
+-(void)setKNPageCotrollPostion:(KNPageControllPostion)KNPageCotrollPostion
+{
+    _KNPageCotrollPostion = KNPageCotrollPostion;
+    //设置隐藏模式。 如果设置了隐藏就隐藏。 图片数量等于1的时候也设置成隐藏
+    _pageControl.hidden = (_KNPageCotrollPostion == KNPostionHide) || (self.images.count == 1);
+    if (_pageControl.hidden) return;
+    
+    CGSize size;
+    if (!_pageImageSize.width) { // 没有设置图片。 系统有原有样式
+        size = [_pageControl sizeForNumberOfPages:_pageControl.numberOfPages];
+        size.height = 8;
+    }else{
+        //设置了图片
+        size = CGSizeMake(_pageImageSize.width *(_pageControl.numberOfPages * 2 - 1), _pageImageSize.height);
+    }
+    _pageControl.frame = CGRectMake(0, 0, size.width, size.height);
+    
+    CGFloat centerY = self.height - size.height *0.5 - VERMARGIN
+    - (self.descLable.hidden ? 0 : DEFAULTHEIGT);
+    CGFloat pointY = self.height - size.height - VERMARGIN - (self.descLable.hidden ?0 : DEFAULTHEIGT);
+    
+    if (_KNPageCotrollPostion == KNPostionDefalut || _KNPageCotrollPostion == KNPostionBottomCenter) {
+        _pageControl.center = CGPointMake(self.width, centerY);
+    }else if (_KNPageCotrollPostion == KNPostionBottomLeft){
+        _pageControl.frame = CGRectMake(DEFAULTPOTINT, pointY, size.width, size.height);
+    }else{
+        _pageControl.frame = CGRectMake(self.height - DEFAULTPOTINT - size.width , pointY, size.width, size.height);
+    }
+    
+    if (!CGPointEqualToPoint(_pageOffset , CGPointZero)) {
+        self.pageOffset = _pageOffset;
+    }
+    
+}
+
+
+- (void)setPageOffset:(CGPoint)pageOffset {
+    _pageOffset = pageOffset;
+    CGRect frame = _pageControl.frame;
+    frame.origin.x += pageOffset.x;
+    frame.origin.y += pageOffset.y;
+    _pageControl.frame = frame;
+}
+
+
+-(void)setKNChangeMode:(KNChangeMode)KNChangeMode
+{
+    _KNChangeMode = KNChangeMode;
+    if (KNChangeMode == KNChangeModeFade) {
+        _gifPlayMode = KNGifPlayModeAlways;
+    }
+    
+}
+
+-(void)nextPage{
+    if (_KNChangeMode == KNChangeModeFade) {
+        
+        self.nextIndex = (self.currIndex + 1) % self.images.count;
+        self.otherImageView.image = _images[_currIndex];
+        
+        [UIView animateWithDuration:1.2 animations:^{
+            self.currImageView.alpha = 0;
+            self.otherImageView.alpha = 1;
+            self.pageControl.currentPage = _nextIndex;
+        } completion:^(BOOL finished) {
+            [self changToNext];
+        }];
+        
+    }else{
+        [self.scrollView setContentOffset:CGPointMake(self.width *3, 0) animated:YES];
+    }
+}
+
+
+#pragma mark- --------定时器相关方法--------
+- (void)startTimer {
+    //如果只有一张图片，则直接返回，不开启定时器
+    if (self.imageArray.count <= 1) return;
+    //如果定时器已开启，先停止再重新开启
+    if (self.timer) [self stopTimer];
+    __weak typeof (self)weakSelf = self;
+    self.timer = [NSTimer kn_TimerWithTimeInterval:_time < 1 ? DEFAULTTIME: _time repeats:YES block:^(NSTimer * _Nonnull timer) {
+        [weakSelf nextPage];
+    }];
+    [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
+}
+
+
+
+
+
+//切换图片
+-(void)changToNext{
+    if (_KNChangeMode == KNChangeModeFade) {
+        self.currImageView.alpha = 1;
+        self.otherImageView.alpha = 0;
+    }
+    //切换下张图片
+    self.currImageView.image = self.otherImageView.image;
+    self.scrollView.contentOffset = CGPointMake(self.width * 2, 0);
+    [self.scrollView layoutSubviews];
+    self.currIndex = self.nextIndex;
+    self.pageControl.currentPage = self.nextIndex;
+    self.descLable.text = self.titles[self.currIndex];
+}
+
+
+-(void)setGifPlayMode:(KNGifPlayMode)gifPlayMode
+{
+    if (_KNChangeMode == KNChangeModeFade)return;
+    _gifPlayMode = gifPlayMode;
+    
+    if (gifPlayMode == KNGifPlayModeAlways) {
+        [self gifAnimating:YES];
+    }else if(gifPlayMode == KNGifPlayModeNever)
+    {
+        [self gifAnimating:NO];
+    }
 }
 
 #pragma mark - 设置相关
@@ -107,6 +344,152 @@ static NSString *cache;
     _DescLableBackgroundColor = DescLableBackgroundColor;
     self.descLable.backgroundColor = DescLableBackgroundColor;
 }
+
+#pragma mark 设置pageControl的指示器图片
+-(void)setPageColor:(UIColor *)color andCurrentPageColor:(UIColor *)currentColor{
+    self.pageControl.pageIndicatorTintColor = color;
+    self.pageControl.currentPageIndicatorTintColor = currentColor;
+}
+
+-(void)setPageImage:(UIImage *)image andCurrentPageImage:(UIImage *)currentImage{
+    if (!image || !currentImage)return;
+    
+    self.pageImageSize = image.size;
+    [self.pageControl setValue:currentImage forKey:@"_currentPageImage"];
+    [self.pageControl setValue:image forKey:@"_pageImage"];
+}
+
+#pragma mark - 下载网络图片
+-(void)downloadImages:(int)index{
+    NSString *urlString = self.imageArray[index];
+    NSString *imageName = [urlString stringByReplacingOccurrencesOfString:@"/" withString:@""];
+    NSString *path = [cache stringByAppendingPathComponent:imageName];
+    //如果开启了缓存功能，先从沙盒中取图片
+    if (_autoCache) {
+        NSData *data = [NSData dataWithContentsOfFile:path];
+        if (data) {
+            _images[index] = getImageWithData(data);
+            return;
+        }
+    }
+    
+    //下载图片
+    NSBlockOperation *doenload = [NSBlockOperation blockOperationWithBlock:^{
+        NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:urlString]];
+        if (!data) return ;
+        UIImage *image = getImageWithData(data);
+        //取到的data有可能不是图片
+        if (image) {
+            //替换掉
+            self.images[index] = image;
+            //如果下载的图片为当前要现实的图片。直接回到主线程设置图片
+            if (_currIndex == index)[self.currImageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:NO];
+            //然后如果是开启缓存。就写人文件夹
+            if (_autoCache) [data writeToFile:path atomically:YES];
+        }
+    }];
+    //加入队列
+    [self.queue addOperation:doenload];
+}
+
+
+#pragma mark 下载图片，如果是gif则计算动画时长
+UIImage *getImageWithData(NSData *data) {
+    CGImageSourceRef imageSource = CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL);
+    size_t count = CGImageSourceGetCount(imageSource);
+    if (count <= 1) { //非gif
+        CFRelease(imageSource);
+        return [[UIImage alloc] initWithData:data];
+    } else { //gif图片
+        NSMutableArray *images = [NSMutableArray array];
+        NSTimeInterval duration = 0;
+        for (size_t i = 0; i < count; i++) {
+            CGImageRef image = CGImageSourceCreateImageAtIndex(imageSource, i, NULL);
+            if (!image) continue;
+            duration += durationWithSourceAtIndex(imageSource, i);
+            [images addObject:[UIImage imageWithCGImage:image]];
+            CGImageRelease(image);
+        }
+        if (!duration) duration = 0.1 * count;
+        CFRelease(imageSource);
+        return [UIImage animatedImageWithImages:images duration:duration];
+    }
+}
+
+
+#pragma mark 获取每一帧图片的时长
+float durationWithSourceAtIndex(CGImageSourceRef source, NSUInteger index) {
+    float duration = 0.1f;
+    CFDictionaryRef propertiesRef = CGImageSourceCopyPropertiesAtIndex(source, index, nil);
+    NSDictionary *properties = (__bridge NSDictionary *)propertiesRef;
+    NSDictionary *gifProperties = properties[(NSString *)kCGImagePropertyGIFDictionary];
+    
+    NSNumber *delayTime = gifProperties[(NSString *)kCGImagePropertyGIFUnclampedDelayTime];
+    if (delayTime) duration = delayTime.floatValue;
+    else {
+        delayTime = gifProperties[(NSString *)kCGImagePropertyGIFDelayTime];
+        if (delayTime) duration = delayTime.floatValue;
+    }
+    CFRelease(propertiesRef);
+    return duration;
+}
+
+#pragma mark 清除沙盒中的图片缓存
++ (void)clearDiskCache {
+    NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cache error:NULL];
+    for (NSString *fileName in contents) {
+        [[NSFileManager defaultManager] removeItemAtPath:[cache stringByAppendingPathComponent:fileName] error:nil];
+    }
+}
+
+
+
+- (void)gifAnimating:(BOOL)b {
+    [self gifAnimating:b view:self.currImageView];
+    [self gifAnimating:b view:self.otherImageView];
+}
+
+
+- (void)gifAnimating:(BOOL)isPlay view:(UIImageView *)imageV {
+    if (isPlay) {
+        CFTimeInterval pausedTime = [imageV.layer timeOffset];
+        imageV.layer.speed = 1.0;
+        imageV.layer.timeOffset = 0.0;
+        imageV.layer.beginTime = 0.0;
+        CFTimeInterval timeSincePause = [imageV.layer convertTime:CACurrentMediaTime() fromLayer:nil] -    pausedTime;
+        imageV.layer.beginTime = timeSincePause;
+    } else {
+        CFTimeInterval pausedTime = [imageV.layer convertTime:CACurrentMediaTime() fromLayer:nil];
+        imageV.layer.speed = 0.0;
+        imageV.layer.timeOffset = pausedTime;
+    }
+}
+
+
+#pragma mark 设置定时器时间
+- (void)setTime:(NSTimeInterval)time {
+    _time = time;
+    [self startTimer];
+}
+
+
+
+
+- (void)stopTimer {
+    [self.timer invalidate];
+    self.timer = nil;
+}
+
+
+
+#pragma mark 图片点击事件
+- (void)imageClick {
+    
+    ([_delegate respondsToSelector:@selector(KNBillboadrView:ClickImageForIndex:)]);
+    [_delegate KNBillboadrView:self ClickImageForIndex:self.currIndex];
+    
+}
+
 #pragma mark - 懒加载.
 -(NSOperationQueue *)queue{
     if (!_queue) {
@@ -168,17 +551,26 @@ static NSString *cache;
     return _pageControl;
 }
 
--(NSMutableArray *)titleArray{
-    if (!_titleArray) {
-        _titleArray = [NSMutableArray array];
+-(NSMutableArray *)titles{
+    if (!_titles) {
+        _titles = [NSMutableArray array];
     }
-    return _titleArray;
+    return _titles;
 }
--(NSMutableArray *)imageArray{
+-(NSArray *)imageArray{
     if (!_imageArray) {
-        _imageArray = [NSMutableArray array];
+        _imageArray = [NSArray array];
     }
     return _imageArray;
 }
+
+-(NSMutableArray *)images{
+    if (!_images) {
+        _images = [NSMutableArray array];
+    }
+    return _images;
+}
+
+
 
 @end

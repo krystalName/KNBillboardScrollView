@@ -19,6 +19,14 @@ typedef NS_ENUM(NSInteger, KNPageControllPostion){
 };
 
 
+//gif播放方式
+typedef NS_ENUM(NSInteger, KNGifPlayMode) {
+    KNGifPlayModeAlways,          //始终播放
+    KNGifPlayModeNever,           //从不播放
+    KNGifPlayModePauseWhenScroll  //切换图片时不播放
+};
+
+
 //图片切换方式
 typedef NS_ENUM(NSInteger, KNChangeMode){
     KNChangeModeDefault, //轮播滚动
@@ -34,7 +42,7 @@ typedef NS_ENUM(NSInteger, KNChangeMode){
  @param BillboadrView 控件本身
  @param index 当前点击图片的下标
  */
--(void)KNBillboadrView:(KNBillboadrView *)BillboadrView ClickImageForIndex:(NSInteger *)index;
+-(void)KNBillboadrView:(KNBillboadrView *)BillboadrView ClickImageForIndex:(NSInteger )index;
 
 @end
 
@@ -59,8 +67,9 @@ UIImage *gitImageNamed(NSString *imageName);
  @param frame rect.位置设置大小
  @param imageArray 图片数组
  @param descArray 描叙数组,可为空,为空情况不显示描叙文字
+ @param andplaceholdImage 默认图。网络图片没加载出来的时候使用
  */
--(instancetype)initKNBillboadrViewWithFrame:(CGRect )frame andImageArray:(NSArray *)imageArray andDescArray:(NSArray *)descArray;
+-(instancetype)initKNBillboadrViewWithFrame:(CGRect )frame andImageArray:(NSArray *)imageArray andDescArray:(NSArray *)descArray andplaceholdImage:(UIImage *)placeholdImage;
 
 
 /**
@@ -89,7 +98,7 @@ UIImage *gitImageNamed(NSString *imageName);
 /**
  停止定时器
  */
--(void)StopTimer;
+-(void)stopTimer;
 
 /**
  清理沙盒中图片缓存
@@ -106,11 +115,18 @@ UIImage *gitImageNamed(NSString *imageName);
 ///设置分页控件位置, 默认为PositionBottomCenter/一张图片时隐藏
 @property(nonatomic, assign)KNPageControllPostion KNPageCotrollPostion;
 
+//设置gif播放的方式//默认为KNGifPlayModeAlways.
+@property(nonatomic, assign)KNGifPlayMode gifPlayMode;
+
+
 ///属性无法满足。自行设置分页的Positio
 @property(nonatomic, assign)CGPoint pageOffset;
 
-///设置占位图 默认设置为 KNBilboardDefalutImge.png
-@property(nonatomic, strong)UIImage *placeholdImage;
+/**
+ *  每一页停留时间，默认为3s，最少1s
+ *  当设置的值小于1s时，则为默认值
+ */
+@property (nonatomic, assign) NSTimeInterval time;
 
 ///设置图片描叙的颜色 默认白色字体
 @property(nonatomic, strong)UIColor *DescLableColor;
