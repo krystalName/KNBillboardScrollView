@@ -41,8 +41,6 @@
     _bollboadrView.delegate = self;
     //设置分页控件的位置，默认为PositionBottomCenter
     _bollboadrView.KNPageCotrollPostion = KNPostionBottomLeft;
-    //设置切换时间
-    _bollboadrView.time = 5.f;
     //设置动画
     _bollboadrView.KNChangeMode = KNChangeModeFade;
     
