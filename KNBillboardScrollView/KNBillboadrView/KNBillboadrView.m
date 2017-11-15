@@ -199,6 +199,36 @@ static NSString *cache;
     }
     
     //滚动过程中。改变当前页码
+    [self changeCurrentPageWithOffset:offsetX];
+    
+    //判断向右滚动
+    if(offsetX < self.width * 2){
+        if (_KNChangeMode == KNChangeModeFade) {
+            self.currImageView.alpha = offsetX / self.width -1;
+            self.otherImageView.alpha = 2 - offsetX / self.width;
+        }else{
+            self.otherImageView.frame = CGRectMake(self.width, 8, self.width, self.height);
+        }
+        self.nextIndex = self.currIndex -1;
+        if (self.nextIndex < 0) {
+            self.nextIndex = self.images.count -1;
+        }
+        self.otherImageView.image = self.images[self.nextIndex];
+        if (offsetX <= self.width ) {
+            [self changToNext];
+        }
+        
+    }else if(offsetX > self.width * 2){
+         if (_KNChangeMode == KNChangeModeFade) {
+             self.otherImageView.alpha = offsetX / self.width -2;
+             self.currImageView.alpha = 3 - offsetX / self.width;
+         }else{
+             self.otherImageView.frame = CGRectMake(CGRectGetMaxX(_currImageView.frame), 0, self.width, self.height);
+         }
+        self.nextIndex = (self.currIndex + 1) % self.images.count;
+        self.otherImageView.image = self.images[self.nextIndex];
+        if (offsetX >= self.width * 3) [self changToNext];
+    }
 }
 
 
