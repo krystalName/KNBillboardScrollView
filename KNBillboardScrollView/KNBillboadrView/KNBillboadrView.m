@@ -150,7 +150,6 @@ static NSString *cache;
     }
     if (_currIndex >= self.images.count)_currIndex = self.images.count -1;
     self.currImageView.image = self.images[_currIndex];
-    self.descLable.text = self.titles[_currIndex];
     self.pageControl.numberOfPages = self.images.count;
     [self layoutSubviews];
 }
