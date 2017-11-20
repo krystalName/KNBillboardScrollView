@@ -37,16 +37,14 @@
     //创建广告栏
     _bollboadrView = [[KNBillboadrView alloc]initKNBillboadrViewWithFrame:CGRectMake(0, 50, [UIScreen mainScreen].bounds.size.width, 200) andImageArray:imageArray andDescArray:descArray andplaceholdImage:[UIImage imageNamed:@"KNBilboardDefalutImge.png"]];
     
-    [_bollboadrView setPageColor:[UIColor redColor] andCurrentPageColor:[UIColor whiteColor]];
+//    [_bollboadrView setPageColor:[UIColor redColor] andCurrentPageColor:[UIColor whiteColor]];
     
     //设置代理
     _bollboadrView.delegate = self;
-    //设置分页控件的位置，默认为PositionBottomCenter
-    _bollboadrView.KNPageCotrollPostion = KNPostionBottomLeft;
-    //时间有点短。 我改成5秒。
+    _bollboadrView.KNPageCotrollPostion = KNPostionBottomRtight;
+    [_bollboadrView setPageImage:[UIImage imageNamed:@"4"] andCurrentPageImage:[UIImage imageNamed:@"5"]];
     _bollboadrView.time = 5.f;
-    //设置动画
-    _bollboadrView.KNChangeMode = KNChangeModeFade;
+    
     // 设置滑动时gif停止播放
     _bollboadrView.gifPlayMode = KNGifPlayModePauseWhenScroll;
     

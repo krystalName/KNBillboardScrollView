@@ -90,7 +90,7 @@ static NSString *cache;
         //先获取到值。
         self.placeholdImage = placeholdImage;
         self.imageArray = imageArray;
-        self.titles = [NSMutableArray arrayWithArray:descArray];
+        self.titles = descArray.count > 0 ? [NSMutableArray arrayWithArray:descArray] : nil;
         //然后初始化控件
         [self initView];
     }
@@ -202,11 +202,12 @@ static NSString *cache;
     CGFloat pointY = self.height - size.height - VERMARGIN - (self.descLable.hidden ?0 : DEFAULTHEIGT);
     
     if (_KNPageCotrollPostion == KNPostionDefalut || _KNPageCotrollPostion == KNPostionBottomCenter) {
-        _pageControl.center = CGPointMake(self.width, centerY);
+        _pageControl.center = CGPointMake(self.width / 2, centerY);
+        
     }else if (_KNPageCotrollPostion == KNPostionBottomLeft){
         _pageControl.frame = CGRectMake(DEFAULTPOTINT, pointY, size.width, size.height);
     }else{
-        _pageControl.frame = CGRectMake(self.height - DEFAULTPOTINT - size.width , pointY, size.width, size.height);
+        _pageControl.frame = CGRectMake(self.width - DEFAULTPOTINT - size.width , pointY, size.width, size.height);
     }
     
     if (!CGPointEqualToPoint(_pageOffset , CGPointZero)) {
@@ -636,12 +637,7 @@ float durationWithSourceAtIndex(CGImageSourceRef source, NSUInteger index) {
     return _pageControl;
 }
 
--(NSMutableArray *)titles{
-    if (!_titles) {
-        _titles = [NSMutableArray array];
-    }
-    return _titles;
-}
+
 -(NSArray *)imageArray{
     if (!_imageArray) {
         _imageArray = [NSArray array];
