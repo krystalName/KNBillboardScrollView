@@ -193,12 +193,14 @@ static NSString *cache;
         size.height = 8;
     }else{
         //设置了图片
-        size = CGSizeMake(_pageImageSize.width *(_pageControl.numberOfPages * 2 - 1), _pageImageSize.height);
+        size = CGSizeMake(_pageImageSize.width *(_pageControl.numberOfPages * 2.5), _pageImageSize.height);
+        
     }
     _pageControl.frame = CGRectMake(0, 0, size.width, size.height);
     
     CGFloat centerY = self.height - size.height *0.5 - VERMARGIN
     - (self.descLable.hidden ? 0 : DEFAULTHEIGT);
+    
     CGFloat pointY = self.height - size.height - VERMARGIN - (self.descLable.hidden ?0 : DEFAULTHEIGT);
     
     if (_KNPageCotrollPostion == KNPostionDefalut || _KNPageCotrollPostion == KNPostionBottomCenter) {

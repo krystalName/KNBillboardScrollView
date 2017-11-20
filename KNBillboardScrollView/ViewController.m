@@ -41,7 +41,7 @@
     
     //设置代理
     _bollboadrView.delegate = self;
-    _bollboadrView.KNPageCotrollPostion = KNPostionBottomRtight;
+    _bollboadrView.KNPageCotrollPostion = KNPostionBottomLeft;
     [_bollboadrView setPageImage:[UIImage imageNamed:@"4"] andCurrentPageImage:[UIImage imageNamed:@"5"]];
     _bollboadrView.time = 5.f;
     
