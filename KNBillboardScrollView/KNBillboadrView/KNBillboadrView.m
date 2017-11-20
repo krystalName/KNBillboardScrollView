@@ -298,7 +298,7 @@ static NSString *cache;
             self.currImageView.alpha = offsetX / self.width -1;
             self.otherImageView.alpha = 2 - offsetX / self.width;
         }else{
-            self.otherImageView.frame = CGRectMake(self.width, 8, self.width, self.height);
+            self.otherImageView.frame = CGRectMake(self.width, 0, self.width, self.height);
         }
         self.nextIndex = self.currIndex -1;
         if (self.nextIndex < 0) self.nextIndex = self.images.count -1;
