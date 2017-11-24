@@ -87,8 +87,8 @@ static NSString *cache;
 {
     self = [super initWithFrame:frame];
     if (self) {
-        //先获取到值。
-        self.placeholdImage = placeholdImage;
+        
+        self.placeholdImage = placeholdImage ?:[UIImage new];
         self.imageArray = imageArray;
         self.titles = descArray.count > 0 ? [NSMutableArray arrayWithArray:descArray] : nil;
         //然后初始化控件
