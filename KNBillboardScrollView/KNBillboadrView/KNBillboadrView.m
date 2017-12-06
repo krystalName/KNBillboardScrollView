@@ -456,6 +456,8 @@ float durationWithSourceAtIndex(CGImageSourceRef source, NSUInteger index) {
     return duration;
 }
 
+
+
 #pragma mark 清除沙盒中的图片缓存
 + (void)clearDiskCache {
     NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cache error:NULL];
