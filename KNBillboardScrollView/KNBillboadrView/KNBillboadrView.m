@@ -390,7 +390,7 @@ static NSString *cache;
     if (_autoCache) {
         NSData *data = [NSData dataWithContentsOfFile:path];
         if (data) {
-            _images[index] = getImageWithData(data);
+            _images[index] = [YYImage imageWithData:data];
             return;
         }
     }
@@ -399,7 +399,7 @@ static NSString *cache;
     NSBlockOperation *doenload = [NSBlockOperation blockOperationWithBlock:^{
         NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:urlString]];
         if (!data) return ;
-        UIImage *image = getImageWithData(data);
+        UIImage *image = [YYImage imageWithData:data];
         //取到的data有可能不是图片
         if (image) {
             //替换掉
@@ -415,46 +415,6 @@ static NSString *cache;
 }
 
 
-#pragma mark 下载图片，如果是gif则计算动画时长
-UIImage *getImageWithData(NSData *data) {
-    CGImageSourceRef imageSource = CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL);
-    size_t count = CGImageSourceGetCount(imageSource);
-    if (count <= 1) { //非gif
-        CFRelease(imageSource);
-        return [[UIImage alloc] initWithData:data];
-    } else { //gif图片
-        NSMutableArray *images = [NSMutableArray array];
-        NSTimeInterval duration = 0;
-        for (size_t i = 0; i < count; i++) {
-            CGImageRef image = CGImageSourceCreateImageAtIndex(imageSource, i, NULL);
-            if (!image) continue;
-            duration += durationWithSourceAtIndex(imageSource, i);
-            [images addObject:[UIImage imageWithCGImage:image]];
-            CGImageRelease(image);
-        }
-        if (!duration) duration = 0.1 * count;
-        CFRelease(imageSource);
-        return [UIImage animatedImageWithImages:images duration:duration];
-    }
-}
-
-
-#pragma mark 获取每一帧图片的时长
-float durationWithSourceAtIndex(CGImageSourceRef source, NSUInteger index) {
-    float duration = 0.1f;
-    CFDictionaryRef propertiesRef = CGImageSourceCopyPropertiesAtIndex(source, index, nil);
-    NSDictionary *properties = (__bridge NSDictionary *)propertiesRef;
-    NSDictionary *gifProperties = properties[(NSString *)kCGImagePropertyGIFDictionary];
-    
-    NSNumber *delayTime = gifProperties[(NSString *)kCGImagePropertyGIFUnclampedDelayTime];
-    if (delayTime) duration = delayTime.floatValue;
-    else {
-        delayTime = gifProperties[(NSString *)kCGImagePropertyGIFDelayTime];
-        if (delayTime) duration = delayTime.floatValue;
-    }
-    CFRelease(propertiesRef);
-    return duration;
-}
 
 
 
@@ -608,14 +568,14 @@ float durationWithSourceAtIndex(CGImageSourceRef source, NSUInteger index) {
 
 -(UIImageView *)currImageView{
     if (!_currImageView) {
-        _currImageView = [[UIImageView alloc]init];
+        _currImageView = [[YYAnimatedImageView alloc]init];
         _currImageView.clipsToBounds = YES;
     }
     return _currImageView;
 }
 -(UIImageView *)otherImageView{
     if (!_otherImageView) {
-        _otherImageView = [[UIImageView alloc]init];
+        _otherImageView = [[YYAnimatedImageView alloc]init];
         _otherImageView.clipsToBounds = YES;
     }
     return _otherImageView;
@@ -659,18 +619,6 @@ float durationWithSourceAtIndex(CGImageSourceRef source, NSUInteger index) {
 @end
 
 
-UIImage *gifImageNamed(NSString *imageName) {
-    
-    if (![imageName hasSuffix:@".gif"]) {
-        imageName = [imageName stringByAppendingString:@".gif"];
-    }
-    
-    NSString *imagePath = [[NSBundle mainBundle] pathForResource:imageName ofType:nil];
-    NSData *data = [NSData dataWithContentsOfFile:imagePath];
-    if (data) return getImageWithData(data);
-    
-    return [UIImage imageNamed:imageName];
-}
 
 
 

@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <YYImage/YYImage.h>
 
 @class KNBillboadrView;
 //pageControll的显示位置
@@ -47,14 +48,6 @@ typedef NS_ENUM(NSInteger, KNChangeMode){
 @end
 
 
-/**
- C语言函数,创建本地gif图片
-
- @param imageName 本地gif图片请使用该函数创建，否则gif无动画效果
- @return 图片名称
- */
-
-UIImage *gifImageNamed(NSString *imageName);
 
 
 @interface KNBillboadrView : UIView

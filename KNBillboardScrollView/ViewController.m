@@ -24,10 +24,10 @@
     
     //定义两个数组。
     NSArray *imageArray = @[
-                             [UIImage imageNamed:@"3.jpg"],
+                             [YYImage imageNamed:@"3.jpg"],
                             @"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1510747788301&di=1265b6a44927172a90f3bebcf088ab02&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2F5243fbf2b2119313373b1edd6f380cd791238d67.jpg",
                              //使用本地gif图片的时候。需要调用这个方法
-                              gifImageNamed(@"2.gif"),
+                              [YYImage imageNamed:@"2.gif"],
                               @"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1510747412310&di=308b1b2e2d6ccb6a35796275fc185eaf&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01f90e593a4ad4a8012193a3dcf03d.gif"
                             ];
     
