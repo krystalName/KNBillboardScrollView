@@ -62,3 +62,30 @@
     
 ```
 -----
+
+## 第二种使用方式
+
+``` objc
+ //第二种方式创建广告栏。 图片数据暂时没有的情况下
+  
+    _bollboadrView = [[KNBillboadrView alloc]initKNBillboadrViewWithFrame:CGRectMake(0, 50, [UIScreen mainScreen].bounds.size.width, 200) andplaceholdImage:[UIImage imageNamed:@"KNBilboardDefalutImge.png"]];
+     
+       [_bollboadrView setBackgroundColor:[UIColor grayColor]];
+    
+    //设置代理
+    _bollboadrView.delegate = self;
+    _bollboadrView.KNPageCotrollPostion = KNPostionBottomLeft;
+    [_bollboadrView setPageImage:[UIImage imageNamed:@"4"] andCurrentPageImage:[UIImage imageNamed:@"5"]];
+    _bollboadrView.time = 5.f;
+    
+    // 设置滑动时gif停止播放
+    _bollboadrView.gifPlayMode = KNGifPlayModePauseWhenScroll;
+    
+    [self.view addSubview:_bollboadrView];
+    
+    
+    ///在获取到数据之后调用
+     [_bollboadrView setImageArray:imageArray andDescArray:descArray];
+     
+```
+
