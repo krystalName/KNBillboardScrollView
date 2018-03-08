@@ -97,6 +97,30 @@ static NSString *cache;
     return self;
 }
 
+
+-(instancetype)initKNBillboadrViewWithFrame:(CGRect)frame andplaceholdImage:(UIImage *)placeholdImage
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        
+        self.placeholdImage = placeholdImage ? :[UIImage new];
+        
+        [self initView];
+    }
+    return self;
+}
+
+
+-(void)setImageArray:(NSArray *)imageArray andDescArray:(NSArray *)descArray
+{
+    self.imageArray = imageArray;
+    self.titles = descArray.count > 0 ? [NSMutableArray arrayWithArray:descArray] : nil;
+    //设置图片
+    [self setImageForArray];
+     //设置标题
+    [self setDescribe];
+}
+
 -(void)initView{
     
     self.autoCache = YES;
@@ -108,7 +132,12 @@ static NSString *cache;
     [self setImageForArray];
     //设置标题
     [self setDescribe];
+    
 }
+
+
+
+
 
 #pragma mark - frame相关
 - (CGFloat)height{

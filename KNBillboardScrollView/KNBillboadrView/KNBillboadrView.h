@@ -66,6 +66,27 @@ typedef NS_ENUM(NSInteger, KNChangeMode){
 -(instancetype)initKNBillboadrViewWithFrame:(CGRect )frame andImageArray:(NSArray *)imageArray andDescArray:(NSArray *)descArray andplaceholdImage:(UIImage *)placeholdImage;
 
 
+
+/**
+ 创建轮播图
+
+ @param frame 设置位置大小
+ @param placeholdImage 默认图
+ @return 轮播图
+ */
+-(instancetype)initKNBillboadrViewWithFrame:(CGRect )frame andplaceholdImage:(UIImage *)placeholdImage;
+
+
+
+/**
+ 设置图片标签
+
+ @param imageArray 设置图片数组
+ @param descArray 设置标题数组
+ */
+-(void)setImageArray:(NSArray *)imageArray andDescArray:(NSArray *)descArray;
+
+
 /**
  设置分也控件指示颜色
  
@@ -115,6 +136,8 @@ typedef NS_ENUM(NSInteger, KNChangeMode){
 
 ///属性无法满足。自行设置分页的Positio
 @property(nonatomic, assign)CGPoint pageOffset;
+
+
 
 /**
  *  每一页停留时间，默认为3s，最少1s
