@@ -113,6 +113,15 @@ static NSString *cache;
 
 -(void)setImageArray:(NSArray *)imageArray andDescArray:(NSArray *)descArray
 {
+    ///清空数据
+    if (self.images.count > 0) {
+        [self.images removeAllObjects];
+    }
+    if (self.titles.count > 0) {
+        [self.titles removeAllObjects];
+    }
+    
+    
     self.imageArray = imageArray;
     self.titles = descArray.count > 0 ? [NSMutableArray arrayWithArray:descArray] : nil;
     //设置图片
