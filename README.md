@@ -29,7 +29,6 @@
 pod 'KNSlidingView'
 ```
 
-+ .首先pod 'YYImage'
 + 获取本地图片的时候。 使用[YYImage imageNamed:@""] 作为创建数组的参数
 
 ## 使用代码
