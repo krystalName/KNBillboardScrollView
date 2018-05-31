@@ -10,7 +10,6 @@
 ![](https://github.com/krystalName/KNBillboardScrollView/blob/master/billboardView.gif)
 
 ## 讲解一点点实现说明. (需要了解详情。 请下载代码到本地观看)
-
 -----
 + 首先。感谢YYImage 这个库。 解决了我使用gif 占用过多内存的问题!
 1. 做无限循环播放的话。需要一个scrollView. 和uiimageView,还有pageControll
@@ -24,7 +23,11 @@
 缓存默认是打开的。 可以设置关闭。 （不过每次都要下载。 所以建议打开缓存）
 ----
 
-## -------- 使用说明 ----------
+## -------- 使用说明(可以用pod导入本组件) ----------
+
+```ruby
+pod 'KNSlidingView'
+```
 
 + .首先pod 'YYImage'
 + 获取本地图片的时候。 使用[YYImage imageNamed:@""] 作为创建数组的参数
